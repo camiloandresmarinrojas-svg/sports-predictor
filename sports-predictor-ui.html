@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pronósticos Deportivos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1200px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .admin-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .admin-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-screen {
+            text-align: center;
+        }
+
+        .welcome-screen h2 {
+            color: #667eea;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .welcome-screen p {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 2px solid #f0f0f0;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+            border-color: #667eea;
+        }
+
+        .card-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .card p {
+            color: #777;
+            font-size: 0.9em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .team-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .team-section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .result-card h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .result-details {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .result-details p {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.3);
+            height: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        /* ESTILOS DEL PANEL DE ADMINISTRADOR */
+        .admin-panel {
+            background: #1a1a2e;
+            color: white;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .admin-header h1 {
+            font-size: 1.8em;
+        }
+
+        .logout-btn {
+            background: #e94560;
+            padding: 10px 25px;
+            border-radius: 20px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #c23b52;
+            transform: scale(1.05);
+        }
+
+        .admin-content {
+            padding: 40px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            font-size: 1em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .number {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-card .change {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .chart-container {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .chart-container h2 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .chart-bar {
+            background: rgba(102, 126, 234, 0.2);
+            height: 40px;
+            border-radius: 10px;
+            margin: 15px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-bar-fill {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            height: 100%;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            transition: width 1s ease;
+        }
+
+        .chart-label {
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            color: #ccc;
+        }
+
+        .activity-table {
+            background: #16213e;
+            border-radius: 15px;
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        .activity-table h2 {
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .activity-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .activity-table th,
+        .activity-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .activity-table th {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .activity-table tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .status-online {
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .status-offline {
+            color: #ff4757;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .login-container h2 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+        }
+
+        .login-container input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-container button {
+            width: 100%;
+        }
+
+        .error-message {
+            background: #ffe0e0;
+            color: #d00;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="admin-btn" onclick="showLogin()">👤 Admin</button>
+            <h1>⚽ Pronósticos Deportivos</h1>
+            <p>Análisis inteligente para tus apuestas</p>
+        </div>
+
+        <div class="content">
+            <!-- Pantalla de Bienvenida -->
+            <div class="screen active" id="welcome">
+                <div class="welcome-screen">
+                    <h2>¡Bienvenido!</h2>
+                    <p>Utiliza nuestro sistema de análisis avanzado para obtener pronósticos precisos basados en estadísticas reales</p>
+                    <div class="btn-group">
+                        <button class="btn" onclick="registrarVisita(); showScreen('menu')">Comenzar</button>
+                        <button class="btn btn-secondary" onclick="alert('¡Gracias por visitarnos!')">Salir</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menú Principal -->
+            <div class="screen" id="menu">
+                <h2 style="text-align: center; color: #667eea; margin-bottom: 30px;">Selecciona el tipo de pronóstico</h2>
+                <div class="card-grid">
+                    <div class="card" onclick="showScreen('ganador'); registrarAccion('Ganador')">
+                        <div class="card-icon">🏆</div>
+                        <h3>Ganador de Encuentro</h3>
+                        <p>Predice qué equipo ganará el partido</p>
+                    </div>
+                    <div class="card" onclick="registrarAccion('Goles'); alert('Próximamente disponible')">
+                        <div class="card-icon">⚽</div>
+                        <h3>Total de Goles</h3>
+                        <p>Estima la cantidad de goles del partido</p>
+                    </div>
+                    <div class="card" onclick="registrarAccion('Esquinas'); alert('Próximamente disponible')">
+                        <div class="card-icon">🚩</div>
+                        <h3>Saques de Esquina</h3>
+                        <p>Predice el total de corners</p>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="showScreen('welcome')">Volver</button>
+                </div>
+            </div>
+
+            <!-- Formulario Ganador -->
+            <div class="screen" id="ganador">
+                <h2 style="text-align: center; color: #667eea; margin-bottom: 30px;">Datos del Encuentro</h2>
+                
+                <div class="team-section">
+                    <h3>⚪ Equipo Local</h3>
+                    <div class="form-group">
+                        <label>Nombre del equipo</label>
+                        <input type="text" placeholder="Ej: Real Madrid">
+                    </div>
+                    <div class="form-group">
+                        <label>Posición en la tabla</label>
+                        <input type="number" placeholder="Ej: 1">
+                    </div>
+                    <div class="form-group">
+                        <label>Goles a favor</label>
+                        <input type="number" placeholder="Ej: 45">
+                    </div>
+                    <div class="form-group">
+                        <label>Goles en contra</label>
+                        <input type="number" placeholder="Ej: 12">
+                    </div>
+                    <div class="form-group">
+                        <label>Cuota de apuesta</label>
+                        <input type="number" step="0.01" placeholder="Ej: 1.85">
+                    </div>
+                    <div class="form-group checkbox-group">
+                        <input type="checkbox" id="local1" checked>
+                        <label for="local1">Juega en casa</label>
+                    </div>
+                </div>
+
+                <div class="team-section">
+                    <h3>⚫ Equipo Visitante</h3>
+                    <div class="form-group">
+                        <label>Nombre del equipo</label>
+                        <input type="text" placeholder="Ej: Barcelona">
+                    </div>
+                    <div class="form-group">
+                        <label>Posición en la tabla</label>
+                        <input type="number" placeholder="Ej: 2">
+                    </div>
+                    <div class="form-group">
+                        <label>Goles a favor</label>
+                        <input type="number" placeholder="Ej: 42">
+                    </div>
+                    <div class="form-group">
+                        <label>Goles en contra</label>
+                        <input type="number" placeholder="Ej: 15">
+                    </div>
+                    <div class="form-group">
+                        <label>Cuota de apuesta</label>
+                        <input type="number" step="0.01" placeholder="Ej: 2.10">
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="showScreen('menu')">Volver</button>
+                    <button class="btn" onclick="registrarPronostico(); showScreen('resultado')">Calcular Pronóstico</button>
+                </div>
+            </div>
+
+            <!-- Pantalla de Resultado -->
+            <div class="screen" id="resultado">
+                <div class="result-card">
+                    <h2>🎯 Pronóstico</h2>
+                    <div class="result-details">
+                        <p><strong>Real Madrid</strong></p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%"></div>
+                        </div>
+                        <p>Rendimiento: 0.68 puntos</p>
+                    </div>
+                    <div class="result-details">
+                        <p><strong>Barcelona</strong></p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 55%"></div>
+                        </div>
+                        <p>Rendimiento: 0.54 puntos</p>
+                    </div>
+                    <h2 style="margin-top: 30px; font-size: 3em;">🏆 Real Madrid</h2>
+                    <p style="font-size: 1.2em; opacity: 0.9;">Victoria predicha con alta confianza</p>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="showScreen('menu')">Nuevo Pronóstico</button>
+                    <button class="btn" onclick="showScreen('welcome')">Inicio</button>
+                </div>
+            </div>
+
+            <!-- Login Administrador -->
+            <div class="screen" id="login">
+                <div class="login-container" style="margin: 0;">
+                    <h2>🔐 Acceso Administrador</h2>
+                    <div id="loginError" class="error-message" style="display: none;"></div>
+                    <input type="text" id="adminUser" placeholder="Usuario" value="admin">
+                    <input type="password" id="adminPass" placeholder="Contraseña" value="admin123">
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="showScreen('welcome')">Cancelar</button>
+                        <button class="btn" onclick="login()">Ingresar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de Administrador -->
+    <div class="admin-panel" id="adminPanel" style="display: none;">
+        <div class="admin-header">
+            <h1>📊 Panel de Administrador</h1>
+            <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+        </div>
+        <div class="admin-content">
+            <!-- Estadísticas Principales -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>👥 Usuarios Conectados</h3>
+                    <div class="number" id="usuariosConectados">0</div>
+                    <div class="change">Ahora mismo</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📈 Total Visitas Hoy</h3>
+                    <div class="number" id="visitasHoy">0</div>
+                    <div class="change">+12% vs ayer</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🎯 Pronósticos Realizados</h3>
+                    <div class="number" id="pronosticosTotal">0</div>
+                    <div class="change">Esta semana</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⏱️ Tiempo Promedio</h3>
+                    <div class="number">3.5m</div>
+                    <div class="change">Por sesión</div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Uso -->
+            <div class="chart-container">
+                <h2>📊 Tipos de Pronósticos Más Solicitados</h2>
+                <div class="chart-label">Ganador de Encuentro - <span id="chartGanador">0</span> veces</div>
+                <div class="chart-bar">
+                    <div class="chart-bar-fill" id="barGanador" style="width: 0%">
+                        <span id="percentGanador">0%</span>
+                    </div>
+                </div>
+                <div class="chart-label">Total de Goles - <span id="chartGoles">0</span> veces</div>
+                <div class="chart-bar">
+                    <div class="chart-bar-fill" id="barGoles" style="width: 0%">
+                        <span id="percentGoles">0%</span>
+                    </div>
+                </div>
+                <div class="chart-label">Saques de Esquina - <span id="chartEsquinas">0</span> veces</div>
+                <div class="chart-bar">
+                    <div class="chart-bar-fill" id="barEsquinas" style="width: 0%">
+                        <span id="percentEsquinas">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Actividad -->
+            <div class="activity-table">
+                <h2>📋 Actividad Reciente</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>Usuario</th>
+                            <th>Acción</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activityTableBody">
+                        <!-- Se llenará dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sistema de seguimiento
+        let stats = {
+            usuariosConectados: 0,
+            visitasHoy: 0,
+            pronosticos: 0,
+            acciones: {
+                'Ganador': 0,
+                'Goles': 0,
+                'Esquinas': 0
+            },
+            actividad: []
+        };
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showLogin() {
+            showScreen('login');
+        }
+
+        function login() {
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+
+            // Credenciales de ejemplo (en producción usar autenticación real)
+            if (user === 'admin' && pass === 'admin123') {
+                document.querySelector('.container').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                actualizarDashboard();
+            } else {
+                const errorDiv = document.getElementById('loginError');
+                errorDiv.textContent = '❌ Usuario o contraseña incorrectos';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            document.querySelector('.container').style.display = 'block';
+            document.getElementById('adminPanel').style.display = 'none';
+            showScreen('welcome');
+        }
+
+        function registrarVisita() {
+            stats.visitasHoy++;
+            stats.usuariosConectados++;
+            agregarActividad('Nuevo Usuario', 'Ingresó al sistema');
+        }
+
+        function registrarAccion(tipo) {
+            stats.acciones[tipo]++;
+            agregarActividad('Usuario', `Consultó: ${tipo}`);
+        }
+
+        function registrarPronostico() {
+            stats.pronosticos++;
+            agregarActividad('Usuario', 'Generó pronóstico completo');
+        }
+
+        function agregarActividad(usuario, accion) {
+            const hora = new Date().toLocaleTimeString();
+            stats.actividad.unshift({
+                hora,
+                usuario,
+                accion,
+                estado: 'online'
+            });
+            if (stats.actividad.length > 10) {
+                stats.actividad.pop();
+            }
+        }
+
+        function actualizarDashboard() {
+            // Actualizar números
+            document.getElementById('usuariosConectados').textContent = stats.usuariosConectados;
+            document.getElementById('visitasHoy').textContent = stats.visitasHoy;
+            document.getElementById('pronosticosTotal').textContent = stats.pronosticos;
+
+            // Actualizar gráficos
+            const total = stats.acciones.Ganador + stats.acciones.Goles + stats.acciones.Esquinas || 1;
+            
+            const percGanador = Math.round((stats.acciones.Ganador / total) * 100);
+            const percGoles = Math.round((stats.acciones.Goles / total) * 100);
+            const percEsquinas = Math.round((stats.acciones.Esquinas / total) * 100);
+
+            document.getElementById('chartGanador').textContent = stats.acciones.Ganador;
+            document.getElementById('barGanador').style.width = percGanador + '%';
+            document.getElementById('percentGanador').textContent = percGanador + '%';
+
+            document.getElementById('chartGoles').textContent = stats.acciones.Goles;
+            document.getElementById('barGoles').style.width = percGoles + '%';
+            document.getElementById('percentGoles').textContent = percGoles + '%';
+
+            document.getElementById('chartEsquinas').textContent = stats.acciones.Esquinas;
+            document.getElementById('barEsquinas').style.width = percEsquinas + '%';
+            document.getElementById('percentEsquinas').textContent = percEsquinas + '%';
+
+            // Actualizar tabla de actividad
+            const tbody = document.getElementById('activityTableBody');
+            tbody.innerHTML = '';
+            stats.actividad.forEach(item => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${item.hora}</td>
+                    <td>${item.usuario}</td>
+                    <td>${item.accion}</td>
+                    <td class="status-${item.estado}">${item.estado === 'online' ? '🟢 Activo' : '🔴 Inactivo'}</td>
+                `;
+            });
+
+            // Simular usuarios activos (decrementar cada 30 segundos)
+            setTimeout(() => {
+                if (stats.usuariosConectados > 0) {
+                    stats.usuariosConectados = Math.max(0, stats.usuariosConectados - Math.floor(Math.random() * 2));
+                }
+            }, 30000);
+        }
+
+        // Simular algo de actividad inicial para demostración
+        setTimeout(() => {
+            stats.visitasHoy = 47;
+            stats.pronosticos = 23;
+            stats.acciones.Ganador = 15;
+            stats.acciones.Goles = 5;
+            stats.acciones.Esquinas = 3;
+            stats.usuariosConectados = 3;
+
+            agregarActividad('Juan P.', 'Consultó: Ganador');
+            agregarActividad('María G.', 'Generó pronóstico completo');
+            agregarActividad('Carlos R.', 'Ingresó al sistema');
+        }, 1000);
+    </script>
+</body>
+</html>
